@@ -7,7 +7,6 @@ import repositories.repositories.TransactionRepository;
 import repositories.repositories.UserRepository;
 import services.exceptions.MainException;
 import services.exceptions.transaction.NotEnoughMoneyException;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,6 +20,16 @@ import java.util.List;
 public class TransactionInMemory implements TransactionRepository {
 
     private final UserRepository userRepository;
+
+    public static Connection connection;
+
+    static {
+        try {
+            connection = LiquibaseConnection.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public TransactionInMemory() {
         this.userRepository = UserRepositorySingleton.getUserRepositoryInstance();
@@ -36,7 +45,7 @@ public class TransactionInMemory implements TransactionRepository {
         List<String> transactionsIds = new ArrayList<>();
         Integer userId;
 
-        try(Connection connection = LiquibaseConnection.getConnection();
+        try(
         PreparedStatement statement = connection.prepareStatement("SELECT transaction_id FROM wallet.transaction WHERE user_id=?")) {
 
             User user = userRepository.findUserByLogin(login);
@@ -72,7 +81,7 @@ public class TransactionInMemory implements TransactionRepository {
      */
     @Override
     public void saveTransaction(String login, String id, String type, String condition, String note) {
-        try(Connection connection = LiquibaseConnection.getConnection();
+        try(
             PreparedStatement statement = connection.prepareStatement("INSERT INTO wallet.transaction" +
                     " (transaction_id, type, condition, note, user_id)" +
                     " VALUES(?, ?, ?, ?, ?)")) {
@@ -100,7 +109,7 @@ public class TransactionInMemory implements TransactionRepository {
     public List<Transaction> receiveTransactionsHistory(String login) {
         List<Transaction> transactions = new ArrayList<>();
 
-        try(Connection connection = LiquibaseConnection.getConnection();
+        try(
         PreparedStatement statement= connection.prepareStatement("SELECT * FROM wallet.transaction WHERE user_id=?")) {
 
             User user = userRepository.findUserByLogin(login);
@@ -131,7 +140,7 @@ public class TransactionInMemory implements TransactionRepository {
      */
     @Override
     public boolean withdraw(String login, double amount) throws MainException {
-        try(Connection connection = LiquibaseConnection.getConnection();
+        try(
         PreparedStatement statement = connection.prepareStatement("UPDATE wallet.users SET balance=? WHERE login=?")) {
 
             User user = userRepository.findUserByLogin(login);
@@ -159,7 +168,7 @@ public class TransactionInMemory implements TransactionRepository {
     @Override
     public void replenish(String login, double amount) {
 
-        try(Connection connection = LiquibaseConnection.getConnection();
+        try(
         PreparedStatement statement = connection.prepareStatement("UPDATE wallet.users SET balance=? WHERE login=?")) {
 
             User user = userRepository.findUserByLogin(login);
@@ -176,7 +185,7 @@ public class TransactionInMemory implements TransactionRepository {
     @Override
     public Double currentBalance(String login) {
         Double balance = 0.0;
-        try(Connection connection = LiquibaseConnection.getConnection();
+        try(
             PreparedStatement statement = connection.prepareStatement("SELECT balance FROM wallet.users WHERE login=?")) {
 
             User user = userRepository.findUserByLogin(login);

@@ -12,6 +12,17 @@ import java.util.List;
  */
 public class UserInMemory implements UserRepository {
 
+
+    public static Connection connection;
+
+    static {
+        try {
+            connection = LiquibaseConnection.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * The findUserByLogin method used to search a user in storage by passed key.
      * @param login user login.
@@ -19,7 +30,7 @@ public class UserInMemory implements UserRepository {
      */
     public User findUserByLogin(String login) {
         User user = null;
-        try (Connection connection = LiquibaseConnection.getConnection();
+        try (
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM wallet.users WHERE login=?")) {
             statement.setString(1, login);
             ResultSet rs = statement.executeQuery();
@@ -43,7 +54,7 @@ public class UserInMemory implements UserRepository {
      * @return method return the user that was saved in storage.
      */
     public User addUser(User user) {
-        try(Connection connection = LiquibaseConnection.getConnection();
+        try(
         PreparedStatement statement = connection.prepareStatement("INSERT INTO wallet.users (login, password, balance, role)" +
                 " VALUES(?, ?, ?, ?)")) {
             statement.setString(1, user.getLogin());
@@ -65,7 +76,7 @@ public class UserInMemory implements UserRepository {
     public List<User> users() {
         List<User> users = new ArrayList<>();
 
-        try(Connection connection = LiquibaseConnection.getConnection();
+        try(
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM wallet.users")) {
             ResultSet rs = statement.executeQuery();
             while(rs.next()) {

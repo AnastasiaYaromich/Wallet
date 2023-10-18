@@ -1,6 +1,5 @@
-package infrastructure.out.factories.audit;
+package infrastructure.in;
 
-import infrastructure.in.AuditRepositorySingleton;
 import logic.AuditServiceImpl;
 import services.services.AuditService;
 

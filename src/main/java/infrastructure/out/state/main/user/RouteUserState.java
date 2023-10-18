@@ -2,10 +2,10 @@ package infrastructure.out.state.main.user;
 
 import domain.models.Audit;
 import domain.models.User;
-import infrastructure.out.factories.audit.AuditServiceSingleton;
+import infrastructure.in.AuditServiceSingleton;
 import infrastructure.out.factories.console.ConsoleManager;
 import infrastructure.out.factories.console.ConsoleManagerSingleton;
-import infrastructure.out.factories.user.UserServiceSingleton;
+import infrastructure.in.UserServiceSingleton;
 import infrastructure.out.state.ConsoleState;
 import infrastructure.out.state.main.MainState;
 import infrastructure.out.state.main.wallet.TransactionState;

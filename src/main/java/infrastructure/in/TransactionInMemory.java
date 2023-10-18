@@ -105,7 +105,7 @@ public class TransactionInMemory implements TransactionRepository {
 
             User user = userRepository.findUserByLogin(login);
             if(user != null) {
-                statement.setString(1, String.valueOf(user.getId()));
+                statement.setInt(1, user.getId());
                 ResultSet rs = statement.executeQuery();
                 if (rs.next()) {
                     Transaction transaction = new Transaction();

@@ -1,6 +1,5 @@
-package infrastructure.out.factories.trasaction;
+package infrastructure.in;
 
-import infrastructure.in.TransactionRepositorySingleton;
 import logic.TransactionServiceImpl;
 import services.services.TransactionService;
 

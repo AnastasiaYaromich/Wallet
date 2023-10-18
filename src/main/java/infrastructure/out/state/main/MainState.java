@@ -1,14 +1,11 @@
 package infrastructure.out.state.main;
 
-import domain.models.User;
 import infrastructure.out.factories.console.ConsoleManager;
 import infrastructure.out.factories.console.ConsoleManagerSingleton;
-import infrastructure.out.factories.user.UserServiceSingleton;
+import infrastructure.in.UserServiceSingleton;
 import infrastructure.out.state.ConsoleState;
 import infrastructure.out.state.main.user.AuthenticateUserState;
 import infrastructure.out.state.main.user.RegisterUserState;
-import services.exceptions.MainException;
-import services.exceptions.user.UserNotFoundException;
 import services.services.UserService;
 
 /**

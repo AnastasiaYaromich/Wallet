@@ -1,5 +1,6 @@
 package containers;
 
+import org.junit.ClassRule;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 public class PostgresTestContainer extends PostgreSQLContainer<PostgresTestContainer> {
@@ -12,6 +13,7 @@ public class PostgresTestContainer extends PostgreSQLContainer<PostgresTestConta
         super(IMAGE_VERSION);
     }
 
+    @ClassRule
     public static PostgreSQLContainer getInstance() {
         if(container == null) {
             container = new PostgresTestContainer().withDatabaseName(DATABASE_NAME)

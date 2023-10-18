@@ -1,6 +1,5 @@
-package infrastructure.out.factories.user;
+package infrastructure.in;
 
-import infrastructure.in.UserRepositorySingleton;
 import logic.UserServiceImpl;
 import services.services.UserService;
 

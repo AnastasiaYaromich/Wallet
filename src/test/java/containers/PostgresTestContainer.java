@@ -5,14 +5,14 @@ import org.testcontainers.containers.PostgreSQLContainer;
 public class PostgresTestContainer extends PostgreSQLContainer<PostgresTestContainer> {
 
     public static final String IMAGE_VERSION = "postgres";
-    public static final String DATABASE_NAME = "test";
-    public static PostgreSQLContainer container;
+    public static final String DATABASE_NAME = "postgres";
+    public static PostgreSQLContainer<PostgresTestContainer> container;
 
     public PostgresTestContainer() {
         super(IMAGE_VERSION);
     }
 
-    public static PostgreSQLContainer getInstance() {
+    public static PostgreSQLContainer<PostgresTestContainer> getInstance() {
         if(container == null) {
             container = new PostgresTestContainer().withDatabaseName(DATABASE_NAME)
                     .withUsername("testUser")

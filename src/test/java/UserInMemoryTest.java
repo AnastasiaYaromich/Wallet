@@ -14,12 +14,14 @@ public class UserInMemoryTest extends ContainersEnvironment {
 
     @BeforeEach
     void setUp() {
+
         userInMemory = new UserInMemory();
     }
 
     @BeforeAll
     static void beforeAll() {
         container.start();
+
     }
 
     @AfterAll

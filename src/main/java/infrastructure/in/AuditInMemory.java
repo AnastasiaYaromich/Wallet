@@ -1,20 +1,17 @@
 package infrastructure.in;
 
 import domain.models.Audit;
-import domain.models.Transaction;
 import domain.models.User;
 import infrastructure.out.LiquibaseConnection;
 import repositories.repositories.AuditRepository;
 import repositories.repositories.UserRepository;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 /**
  * The AuditInMemory class implements AuditRepository interface.
@@ -27,6 +24,16 @@ public class AuditInMemory implements AuditRepository {
         this.userRepository = UserRepositorySingleton.getUserRepositoryInstance();
     }
 
+    public static Connection connection;
+
+    static {
+        try {
+            connection = LiquibaseConnection.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * The saveAudit() method save audit record in storage.
      * @param login user login.
@@ -34,7 +41,7 @@ public class AuditInMemory implements AuditRepository {
      */
     @Override
     public void saveAudit(String login, Audit audit) {
-        try(Connection connection = LiquibaseConnection.getConnection();
+        try(
             PreparedStatement statement = connection.prepareStatement("INSERT INTO wallet.audit" +
                     " (type, time, status, note, balance, user_id)" +
                     " VALUES(?, ?, ?, ?, ?, ?)")) {
@@ -64,7 +71,7 @@ public class AuditInMemory implements AuditRepository {
     public List<Audit> userActionAudit(String login) {
         List<Audit> audits = new ArrayList<>();
 
-        try(Connection connection = LiquibaseConnection.getConnection();
+        try(
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM wallet.audit WHERE user_id=?")) {
 
             User user = userRepository.findUserByLogin(login);

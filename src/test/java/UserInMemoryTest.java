@@ -1,78 +1,79 @@
 import domain.models.User;
 import infrastructure.in.UserInMemory;
-import liquibase.exception.LiquibaseException;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.*;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
-import static org.junit.Assert.assertEquals;
-import org.junit.jupiter.api.Test;
 
 @Testcontainers
 public class UserInMemoryTest {
 
-    private static UserInMemory userInMemory;
+    private UserInMemory userInMemory;
     private static Connection connection;
+    private User user;
+
     @Container
     private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres");
 
     @BeforeAll
-    public static void setConnection() throws SQLException, LiquibaseException {
+    public static void setConnection() throws SQLException {
+        postgreSQLContainer.start();
         connection = DriverManager.getConnection(postgreSQLContainer.getJdbcUrl(), postgreSQLContainer.getUsername(), postgreSQLContainer.getPassword());
-        userInMemory = new UserInMemory();
-        UserInMemory.connection = connection;
         ReceiveDDatabaseData.init(connection);
     }
 
-    @Test
-    public void findUserByLogin() {
-        User user = new User();
-        String login = "Afina";
-        user.setLogin(login);
-
-        userInMemory.addUser(user);
-        User addedUser = userInMemory.findUserByLogin(user.getLogin());
-        assertEquals(user.getLogin(), addedUser.getLogin());
-        assertEquals(null, userInMemory.findUserByLogin("cat"));
+    @AfterAll
+    public static void stop() throws SQLException {
+        connection.close();
+        postgreSQLContainer.stop();
     }
 
-    @Test
-    public void addUser() {
-        User user = new User();
-        String login = "Test";
-        user.setLogin(login);
-
-        userInMemory.addUser(user);
-        assertEquals(userInMemory.findUserByLogin(login).getLogin(), user.getLogin());
+    @BeforeEach
+    public void setDatabaseState() {
+        userInMemory = new UserInMemory();
+        UserInMemory.connection = connection;
+        try(PreparedStatement statement = connection.prepareStatement("DELETE FROM wallet.users WHERE login=?")) {
+            statement.setString(1, "someUser");
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void users() {
         List<User> list = userInMemory.users();
-        assertEquals(0, list.size());
-
-        User user = new User();
-        String login = "Tes1";
-        user.setLogin(login);
+        Assertions.assertEquals(0, list.size());
+        user = createTestUser();
         userInMemory.addUser(user);
-
         list = userInMemory.users();
-        assertEquals(1, list.size());
+        Assertions.assertEquals(1, list.size());
     }
 
+    @Test
+    public void addUser() {
+        user = createTestUser();
+        User addedUser = userInMemory.addUser(user);
+        Assertions.assertEquals(1, userInMemory.users().size());
+        Assertions.assertEquals(userInMemory.findUserByLogin(addedUser.getLogin()).getLogin(), user.getLogin());
+    }
 
+    @Test
+    public void findUserByLogin() {
+        user = createTestUser();
+        userInMemory.addUser(user);
+        Assertions.assertEquals(user.getLogin(), userInMemory.findUserByLogin(user.getLogin()).getLogin());
+        Assertions.assertNotNull(userInMemory.findUserByLogin(user.getLogin()));
+    }
 
-
-
-
-
-
-
-
-
+    private User createTestUser() {
+        User user = new User();
+        user.setLogin("someUser");
+        user.setPassword("999999");
+        user.setBalance(0.0);
+        user.setRole("user");
+        return user;
+    }
 }

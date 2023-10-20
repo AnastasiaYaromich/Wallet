@@ -10,7 +10,6 @@ import repositories.repositories.UserRepository;
 import services.exceptions.MainException;
 import services.exceptions.user.UserAlreadyExistException;
 import java.util.List;
-
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 

@@ -1,13 +1,17 @@
 package logic;
 
+import aop.annotations.Speed;
 import domain.models.Audit;
-import repositories.repositories.AuditRepository;
-import services.services.AuditService;
-import java.util.List;
+import dto.AuditDto;
+import infrastructure.out.audit.AuditRepositoryImpl;
+import mappers.AuditMapper;
+import repositories.AuditRepository;
+import services.AuditService;
 
-/**
- * The AuditServiceImpl class implements AuditService interface.
- */
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Speed
 public class AuditServiceImpl implements AuditService {
 
     private final AuditRepository auditRepository;
@@ -16,23 +20,17 @@ public class AuditServiceImpl implements AuditService {
         this.auditRepository = auditRepository;
     }
 
-    /**
-     * The saveAudit() method calls a saveAudit() method in AuditRepository implementation.
-     * @param login user login.
-     * @param audit audit record.
-     */
     @Override
-    public void saveAudit(String login, Audit audit) {
-        auditRepository.saveAudit(login, audit);
+    public AuditDto save(String login, AuditDto auditDto) {
+        Audit audit = AuditMapper.MAPPER.mapToAudit(auditDto);
+        Audit savedAudit = auditRepository.save(login, audit);
+        return AuditMapper.MAPPER.mapToAuditDto(savedAudit);
     }
 
-    /**
-     * The userActionAudit() method calls a userActionAudit() method in AuditRepository implementation.
-     * @param login user login.
-     * @return list of audit records for user.
-     */
     @Override
-    public List<Audit> userActionAudit(String login) {
-        return auditRepository.userActionAudit(login);
+    public List<AuditDto> findAll(String login) {
+        List<Audit> audits = auditRepository.findAll(login);
+        return audits.stream().map((AuditMapper.MAPPER::mapToAuditDto))
+                .collect(Collectors.toList());
     }
 }

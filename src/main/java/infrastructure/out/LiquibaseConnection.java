@@ -1,21 +1,24 @@
 package infrastructure.out;
 
+import aop.annotations.Speed;
 import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-
+@Speed
 public class LiquibaseConnection {
-
     private static Connection connection;
+
+    static {
+        connect();
+    }
 
     public static void connect() {
         try {
@@ -27,13 +30,10 @@ public class LiquibaseConnection {
             String changeLogFile = resourceBundle.getString("changeLogFile");
             connection = DriverManager.getConnection(url, username, password);
 
-
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
             database.setLiquibaseSchemaName(resourceBundle.getString("liquibaseSchemaName"));
             database.setDefaultSchemaName("defaultSchemaName");
 
-           // database.setLiquibaseSchemaName("migration");
-        //    database.setDefaultSchemaName("wallet");
             Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database);
             liquibase.update();
             System.out.println("Migrations was successful!");

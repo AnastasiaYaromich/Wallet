@@ -1,22 +1,21 @@
-package domain.models;
+package dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.math.BigDecimal;
 
-/**
- * Transaction class contains information about user transactions.
- */
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Setter
-public class Transaction {
+@Getter
+public class AuditDto {
     private int id;
-    private String transactionId;
     private String type;
-    private String condition;
+    private String status;
+    private BigDecimal balance;
+    private String dateTime;
     private String note;
 
     public int getId() {
@@ -27,14 +26,6 @@ public class Transaction {
         this.id = id;
     }
 
-    public String getTransactionId() {
-        return transactionId;
-    }
-
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
-    }
-
     public String getType() {
         return type;
     }
@@ -43,12 +34,28 @@ public class Transaction {
         this.type = type;
     }
 
-    public String getCondition() {
-        return condition;
+    public String getStatus() {
+        return status;
     }
 
-    public void setCondition(String condition) {
-        this.condition = condition;
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
+    }
+
+    public String getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(String dateTime) {
+        this.dateTime = dateTime;
     }
 
     public String getNote() {
@@ -59,4 +66,3 @@ public class Transaction {
         this.note = note;
     }
 }
-

@@ -28,45 +28,57 @@ public class AuthorizationServlet extends HttpServlet {
         this.userService = UserServiceSingleton.getUserService();
     }
 
+    public AuthorizationServlet(UserService userService, ObjectMapper objectMapper, JwtTokenUtil jwtTokenUtil) {
+        this.userService = userService;
+        this.objectMapper = objectMapper;
+        this.jwtTokenUtil = jwtTokenUtil;
+    }
+
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String authHeader = request.getHeader("authorization");
-        try {
-            String requestBody = ParseUtils.getRequestBody(request.getInputStream());
 
-            UserDto userDto = null;
-            if (!requestBody.isEmpty()) {
-                userDto = objectMapper.readValue(requestBody, UserDto.class);
-            }
-
-            if (authHeader != null) {
-                String accessToken = authHeader.substring(authHeader.indexOf("Bearer") + 7);
-                if (JwtTokenUtil.isValidToken(accessToken)) {
-                    response.setStatus(HttpServletResponse.SC_CONFLICT);
-                    sendResponse(response, "User already logged in");
-                } else {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    sendResponse(response, "Invalid token");
-                }
-            } else if (userDto != null) {
-                String token;
-                try {
-                    if (userService.findUserByLogin(userDto.getLogin()).getPassword().equals(userDto.getPassword())) {
-                        token = jwtTokenUtil.generateToken(userDto.getLogin());
-                        response.setStatus(HttpServletResponse.SC_OK);
-                        sendResponse(response, token);
-                    } else {
-                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        sendResponse(response, "Bad credentials. Incorrect login or password");
-                    }
-                } catch (UserException e) {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    sendResponse(response, "Bad credentials. Incorrect login or password");
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(authHeader != null && checkIfTokenIsValid(authHeader)) {
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            sendResponse(response, "User already logged in");
+        } else {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            sendResponse(response, "Invalid token");
         }
+        UserDto userDto = getUserCredentialsIfIsExist(request);
+
+        try {
+            if(userDto != null && checkIfCredentialsIsValid(userDto)) {
+                String token = jwtTokenUtil.generateToken(userDto.getLogin());
+                response.setStatus(HttpServletResponse.SC_OK);
+                sendResponse(response, token);
+            }
+        } catch (UserException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            sendResponse(response, "Bad credentials. Incorrect login or password");
+        }
+    }
+
+    private boolean checkIfCredentialsIsValid(UserDto userDto) throws UserException {
+        UserDto user = userService.findUserByLogin(userDto.getLogin());
+        return user != null && user.getPassword().equals(userDto.getPassword());
+    }
+
+    private UserDto getUserCredentialsIfIsExist(HttpServletRequest request) {
+        String login = (String) request.getAttribute("login");
+        String password = (String) request.getAttribute("password");
+        if(login != null && password != null) {
+            UserDto userDto = new UserDto();
+            userDto.setLogin(login);
+            userDto.setPassword(password);
+            return userDto;
+        }
+        return null;
+    }
+
+    private boolean checkIfTokenIsValid(String authHeader) {
+        String token = authHeader.substring(authHeader.indexOf("Bearer") + 7);
+        return JwtTokenUtil.isValidToken(token);
     }
 
     private void sendResponse(HttpServletResponse response, String message) throws IOException {

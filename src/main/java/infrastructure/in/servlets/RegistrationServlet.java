@@ -31,6 +31,13 @@ public class RegistrationServlet extends HttpServlet {
         this.userService = UserServiceSingleton.getUserService();
     }
 
+    public RegistrationServlet(UserService userService, ObjectMapper objectMapper, JwtTokenUtil jwtTokenUtil) {
+        this.objectMapper = objectMapper;
+        this.objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        this.userService = userService;
+        this.jwtTokenUtil = jwtTokenUtil;
+    }
+
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         UserDto userDto = null;

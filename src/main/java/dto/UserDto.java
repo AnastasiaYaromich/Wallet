@@ -1,20 +1,37 @@
-package domain.models;
+package dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 
+@AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Setter
-public class User {
+@Getter
+public class UserDto {
     private int id;
+
+    @NotNull
+    @Size.List({
+            @Size(min = 6, message = "Name should have at least 6 characters"),
+            @Size(max = 9, message = "Name should have at most 9 characters")
+    })
     private String login;
+
+
+    @NotNull
+    @Size.List({
+            @Size(min = 6, message = "Name should have at least 6 characters"),
+            @Size(max = 9, message = "Name should have at most 9 characters")
+    })
     private String password;
-    private String role = "user";
-    private BigDecimal balance = BigDecimal.ZERO;
+
+    private String role;
+    private BigDecimal balance;
+
 
     public int getId() {
         return id;

@@ -1,18 +1,15 @@
-package domain.models;
+package dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Transaction class contains information about user transactions.
- */
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Setter
-public class Transaction {
+@Getter
+public class TransactionDto {
     private int id;
     private String transactionId;
     private String type;
@@ -59,4 +56,3 @@ public class Transaction {
         this.note = note;
     }
 }
-

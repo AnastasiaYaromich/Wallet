@@ -1,35 +1,33 @@
 package domain.models;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+
 /**
  * Audit class contains information about user actions.
  */
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class Audit {
-    private String information;
     private int id;
     private String type;
     private String status;
-    private Double balance;
+    private BigDecimal balance;
     private String dateTime;
     private String note;
-
-    public void setInformation(String information) {
-        this.information = information;
-    }
-
-    public String getInformation() {
-        return information;
-    }
 
     public int getId() {
         return id;
     }
 
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getType() {
@@ -40,10 +38,6 @@ public class Audit {
         this.type = type;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getStatus() {
         return status;
     }
@@ -52,11 +46,11 @@ public class Audit {
         this.status = status;
     }
 
-    public Double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(Double balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 
@@ -68,15 +62,11 @@ public class Audit {
         this.dateTime = dateTime;
     }
 
-    @Override
-    public String toString() {
-        return "[" +
-                "id=" + id +
-                ", type='" + type + '\'' +
-                ", dateTime='" + dateTime + '\'' +
-                ", status='" + status + '\'' +
-                ", balance='" + balance + '\'' +
-                ", note='" + note + '\'' +
-                ']';
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 }

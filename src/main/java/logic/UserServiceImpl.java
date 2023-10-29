@@ -1,59 +1,61 @@
 package logic;
 
+import aop.annotations.Speed;
 import domain.models.User;
-import repositories.repositories.UserRepository;
-import services.exceptions.MainException;
-import services.exceptions.user.UserAlreadyExistException;
-import services.exceptions.user.UserNotFoundException;
-import services.services.UserService;
+import dto.UserDto;
+import mappers.UserMapper;
+import repositories.UserRepository;
+import services.UserService;
+import services.exceptions.UserException;
+import services.exceptions.UserIsNotValidException;
+import services.exceptions.UserNotFoundException;
+import services.exceptions.ValidationException;
+import validation.UserValidator;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-/**
- * The UserServiceImpl class implements UserService interface.
- */
+@Speed
 public class UserServiceImpl implements UserService {
+
     private final UserRepository userRepository;
 
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    /**
-     * The addUser() method calls addUser() method in UserRepositoryI implementation.
-     * @param user user to save.
-     * @return method return the user that was saved in storage.
-     * @throws MainException throws if user already exist.
-     */
     @Override
-    public User addUser(User user) throws MainException {
-        if(userRepository.findUserByLogin(user.getLogin()) != null) {
-            throw new UserAlreadyExistException("User already exist.");
+    public UserDto findUserByLogin(String login) throws UserException {
+        Optional<User> user = userRepository.findUserByLogin(login);
+        User foundedUser;
+        if(user.isPresent()) {
+            foundedUser = user.get();
+            return UserMapper.MAPPER.mapUserToDto(foundedUser);
         }
-        return userRepository.addUser(user);
+        throw new UserNotFoundException("User does not exist");
     }
 
-    /**
-     * The findUserByLogin() method calls findUserByLogin() method in UserRepositoryI implementation.
-     * @param login user login.
-     * @return method return the founded user.
-     * @throws MainException throws if user does not found.
-     */
     @Override
-    public User findUserByLogin(String login) throws MainException {
-        User user = userRepository.findUserByLogin(login);
-        if(user == null) {
-            throw new UserNotFoundException("User with this login does not exist.");
+    public UserDto save(UserDto userDto) throws ValidationException {
+        userDto.setBalance(BigDecimal.ZERO);
+        userDto.setRole("user");
+
+        boolean isValid = UserValidator.isValid(userDto);
+        if(isValid) {
+            User user = UserMapper.MAPPER.mapToUser(userDto);
+            User savedUser = userRepository.save(user);
+            return UserMapper.MAPPER.mapUserToDto(savedUser);
         }
-        return user;
+            throw new UserIsNotValidException("Bad credentials. User credentials should" +
+                    " have not null and between 6 and 9 characters.");
     }
 
-    /**
-     * The users() method calls users() method in UserRepositoryI implementation.
-     * @return list of users.
-     */
     @Override
-    public List<User> users() {
-        return userRepository.users();
+    public List<UserDto> findAll() {
+        List<User> users = userRepository.findAll();
+        return users.stream().map(UserMapper.MAPPER::mapUserToDto)
+                .collect(Collectors.toList());
     }
 }

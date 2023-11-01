@@ -12,7 +12,6 @@
             <column name="login" type="VARCHAR(255)"/>
             <column name="password" type="VARCHAR(255)"/>
             <column name="balance" type="DECIMAL"/>
-            <column name="role" type="VARCHAR(255)"/>
         </createTable>
 
         <createSequence sequenceName="user_seq"/>
@@ -21,7 +20,7 @@
     </changeSet>
 
 
-    
+
     <changeSet id="001-create-transaction-table" author="yaromich">
         <createTable tableName="transaction">
             <column name="id" type="BIGINT">
@@ -65,5 +64,36 @@
                                  constraintName="audit_user_fk"
                                  referencedTableName="users"
                                  referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="001-create-role-table" author="yaromich">
+        <createTable tableName="roles">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="role_pk"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+
+        <createSequence sequenceName="role_seq"/>
+        <addDefaultValue tableName="roles" columnName="id"
+                         defaultValueSequenceNext="role_seq"/>
+    </changeSet>
+
+
+    <changeSet id="001-create-users_roles-table" author="yaromich">
+        <createTable tableName="users_roles">
+            <column name="user_id" type="BIGINT"/>
+            <column name="role_id" type="BIGINT"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="users" baseColumnNames="id"
+                                 constraintName="users_roles_user_fk"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="roles" baseColumnNames="id"
+                                 constraintName="users_roles_user_fk"
+                                 referencedTableName="roles"
+                                 referencedColumnNames="id"/>
+        <addUniqueConstraint tableName="users_roles" columnNames="user_id, role_id" constraintName="user_role_pk"/>
     </changeSet>
 </databaseChangeLog>

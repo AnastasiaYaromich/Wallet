@@ -1,0 +1,23 @@
+server:
+  port: 8083
+  servlet:
+    context-path: /wallet
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/wallet_db
+    username: postgres
+    password: 1
+    default-schema: wallet
+  liquibase:
+    change-log: classpath:/db/changelog/changelog.xml
+    user: postgres
+    password: 1
+    enabled: true
+    liquibase-schema: migration
+jwt:
+  secret: fghfgh687657u
+  lifetime: 168
+
+
+#http://localhost:8083/demp_spring_war/swagger-ui.html#/

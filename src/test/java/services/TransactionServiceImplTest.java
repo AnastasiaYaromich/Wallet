@@ -1,10 +1,8 @@
 package services;
 
-
 import com.yaromich.wallet.domain.model.Transaction;
 import com.yaromich.wallet.domain.model.User;
 import com.yaromich.wallet.logic.exceptions.TransactionException;
-import com.yaromich.wallet.logic.exceptions.TransactionIdIsNotUniqueException;
 import com.yaromich.wallet.logic.services.TransactionServiceImpl;
 import com.yaromich.wallet.repositories.TransactionRepository;
 import com.yaromich.wallet.repositories.UserRepository;
@@ -12,10 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
 import java.math.BigDecimal;
-
-import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
 public class TransactionServiceImplTest {

@@ -1,15 +1,15 @@
-version: '3'
+version: '3.0'
 
 services:
   postgres:
     image: postgres
-    domainname: postgres
+    container_name: postgres
     ports:
-      - "5433:5432"
+      - "5434:5432"
     environment:
-      - POSTGRES_DB=wallet_db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1
+      POSTGRES_DB: wallet_db
     healthcheck:
       test: ["CMD", "pg_already", "-q", "-U", "postgres"]
       interval: 5s
@@ -21,8 +21,9 @@ services:
     command: --url=jdbc:postgresql://postgres:5432/postgres?user=postgres&password=postgres --changeLogFile=changelog.xml update
     volumes:
       - ./src/main/resources/db/changelog/changelog.xml:/liquibase/changelog.xml
-      - ./src/main/resources/db/changelog/001-create-table.xml:/liquibase/001-create-table.xml
-      - ./src/main/resources/db/changelog/002-insert-data.xml:/liquibase/002-insert-data.xml
+      - ./src/main/resources/db/changelog/001-create-schema.xml:/liquibase/001-create-schema.xml
+      - ./src/main/resources/db/changelog/002-create-table.xml:/liquibase/002-create-table.xml
+      - ./src/main/resources/db/changelog/003-insert-data.xml:/liquibase/003-insert-data.xml
     depends_on:
       - postgres
 

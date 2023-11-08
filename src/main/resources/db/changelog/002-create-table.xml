@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.10.xsd">
+
+    <changeSet id="002-create-user-table" author="yaromich">
+        <validCheckSum>8:f166c725ab9f536b6be6facf64894e02</validCheckSum>
+        <createTable schemaName="wallet" tableName="users">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="user_pk"/>
+            </column>
+            <column name="login" type="VARCHAR(255)"/>
+            <column name="password" type="VARCHAR(255)"/>
+            <column name="balance" type="DECIMAL"/>
+        </createTable>
+
+        <createSequence schemaName="wallet"  sequenceName="user_seq"/>
+        <addDefaultValue schemaName="wallet"  tableName="users" columnName="id"
+                         defaultValueSequenceNext="user_seq"/>
+    </changeSet>
+
+    <changeSet id="002-create-transaction-table" author="yaromich">
+        <validCheckSum>8:192767c7d3e870ae79383a52ca206ed1</validCheckSum>
+        <createTable schemaName="wallet" tableName="transaction">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="transaction_pk"/>
+            </column>
+            <column name="transaction_id" type="VARCHAR(255)"/>
+            <column name="type" type="VARCHAR(255)"/>
+            <column name="condition" type="VARCHAR(255)"/>
+            <column name="note" type="VARCHAR(255)"/>
+            <column name="user_id" type="BIGINT"/>
+        </createTable>
+
+        <createSequence schemaName="wallet"  sequenceName="transaction_seq"/>
+        <addDefaultValue schemaName="wallet"  tableName="transaction" columnName="id"
+                         defaultValueSequenceNext="transaction_seq"/>
+
+        <addForeignKeyConstraint baseTableName="transaction" baseColumnNames="user_id"
+                                 baseTableSchemaName="wallet"
+                                 constraintName="transaction_user_fk"
+                                 referencedTableName="users"
+                                 referencedTableSchemaName="wallet"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="002-create-audit-table" author="yaromich">
+        <validCheckSum>8:17a4d331531d370174abc39db5323697</validCheckSum>
+        <createTable schemaName="wallet"  tableName="audit">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="audit_pk"/>
+            </column>
+            <column name="type" type="VARCHAR(255)"/>
+            <column name="time" type="VARCHAR(255)"/>
+            <column name="status" type="VARCHAR(255)"/>
+            <column name="balance" type="DECIMAL"/>
+            <column name="note" type="VARCHAR(255)"/>
+            <column name="user_id" type="BIGINT"/>
+        </createTable>
+
+        <createSequence schemaName="wallet"  sequenceName="audit_seq"/>
+        <addDefaultValue schemaName="wallet" tableName="audit" columnName="id"
+                         defaultValueSequenceNext="audit_seq"/>
+
+        <addForeignKeyConstraint baseTableName="audit" baseColumnNames="user_id"
+                                 baseTableSchemaName="wallet"
+                                 constraintName="audit_user_fk"
+                                 referencedTableName="users"
+                                 referencedTableSchemaName="wallet"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="002-create-role-table" author="yaromich">
+        <validCheckSum>8:60a3339914b2b2e60c4f3cd3105587b2</validCheckSum>
+        <createTable schemaName="wallet"  tableName="roles">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="role_pk"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+
+        <createSequence schemaName="wallet" sequenceName="role_seq"/>
+        <addDefaultValue schemaName="wallet"  tableName="roles" columnName="id"
+                         defaultValueSequenceNext="role_seq"/>
+    </changeSet>
+
+
+    <changeSet id="002-create-users_roles-table" author="yaromich">
+        <createTable schemaName="wallet" tableName="users_roles">
+            <column name="user_id" type="BIGINT"/>
+            <column name="role_id" type="BIGINT"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="users" baseColumnNames="id"
+                                 baseTableSchemaName="wallet"
+                                 constraintName="users_roles_user_fk"
+                                 referencedTableName="users"
+                                 referencedTableSchemaName="wallet"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="roles" baseColumnNames="id"
+                                 baseTableSchemaName="wallet"
+                                 referencedTableSchemaName="wallet"
+                                 constraintName="users_roles_user_fk"
+                                 referencedTableName="roles"
+                                 referencedColumnNames="id"/>
+        <addUniqueConstraint schemaName="wallet" tableName="users_roles" columnNames="user_id, role_id" constraintName="user_role_pk"/>
+    </changeSet>
+</databaseChangeLog>
